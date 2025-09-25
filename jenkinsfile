@@ -1,0 +1,21 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Build') {
+            steps {
+                sh 'docker-compose build'
+            }
+        }
+        stage('Up'){
+            steps {
+                sh 'docker-compose up -d'
+            }
+        }
+        stage('Test'){
+            steps {
+                sh 'pytest'
+            }
+        }
+    }
+}
