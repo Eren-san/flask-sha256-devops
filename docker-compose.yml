@@ -1,0 +1,47 @@
+version: '3.9'
+
+services:
+  db:
+    image: mysql:8
+    env_file:
+      - ./env/db.env
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+
+  cache:
+    image: memcached:latest
+    ports:
+      - "11211:11211"
+
+  mq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+
+  web:
+    build: .
+    ports:
+      - "5000:5000"
+    depends_on:
+      - db
+      - cache
+      - mq
+    environment:
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_USER: vprofile
+      DB_PASSWORD: vprofilepass
+      MQ_HOST: mq
+      MQ_PORT: 5672
+      CACHE_HOST: cache
+      CACHE_PORT: 11211
+
+volumes:
+  db_data:
+
